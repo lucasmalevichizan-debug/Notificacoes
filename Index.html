@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#1C2B4A"/>
+<title>Notificação de Manutenção — IW21</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS DE DESIGN
+═══════════════════════════════════════════════════ */
+:root {
+  --navy:     #1C2B4A;
+  --navy-d:   #141f38;
+  --bg:       #EEF0F5;
+  --surface:  #FFFFFF;
+  --border:   #E0E4ED;
+  --border-f: #1C2B4A;
+  --text:     #0F172A;
+  --text2:    #475569;
+  --text3:    #94A3B8;
+  --green:    #16A34A;
+  --green-bg: #F0FDF4;
+  --green-bd: #86EFAC;
+  --red:      #DC2626;
+  --red-bg:   #FEF2F2;
+  --p1-bg:#FEE2E2;--p1-bd:#F87171;--p1-tx:#991B1B;
+  --p2-bg:#FFEDD5;--p2-bd:#FB923C;--p2-tx:#9A3412;
+  --p3-bg:#FEF9C3;--p3-bd:#FACC15;--p3-tx:#854D0E;
+  --p4-bg:#DCFCE7;--p4-bd:#4ADE80;--p4-tx:#166534;
+  --font:'Inter',system-ui,sans-serif;
+  --r:8px; --r-lg:14px;
+  --tr:0.15s ease;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);font-size:15px;line-height:1.55;
+  color:var(--text);background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;
+  align-items:center;padding-bottom:60px;
+}
+
+/* ── TOPBAR ───────────────────────────────── */
+.topbar{
+  width:100%;background:var(--navy);
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+.topbar-inner{
+  max-width:620px;margin:0 auto;padding:0 18px;
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-left{display:flex;align-items:center;gap:9px}
+.t-dot{
+  width:7px;height:7px;border-radius:50%;background:#6EE7B7;
+  flex-shrink:0;animation:blink 2.5s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.t-title{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.t-badge{
+  font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:#6EE7B7;background:rgba(110,231,183,.15);
+  border:1px solid rgba(110,231,183,.28);
+  border-radius:5px;padding:3px 9px;
+}
+
+/* ── BANNER LOCAL ─────────────────────────── */
+.local-banner{
+  width:100%;max-width:620px;padding:18px 18px 0;
+}
+.banner-card{
+  background:var(--navy);border-radius:var(--r-lg);
+  padding:18px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  animation:drop .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.b-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6EE7B7;margin-bottom:4px}
+.b-code{font-size:clamp(18px,4.5vw,26px);font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1.1;word-break:break-all}
+.b-desc{font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.b-icon{font-size:34px;opacity:.35;flex-shrink:0}
+
+/* ── LAYOUT PRINCIPAL ─────────────────────── */
+.main{width:100%;max-width:620px;padding:14px 18px 0;display:flex;flex-direction:column;gap:12px}
+
+/* ── CARD ─────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);
+}
+.card-head{
+  padding:16px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.head-icon{
+  width:30px;height:30px;border-radius:7px;
+  background:var(--bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.head-title{font-size:13px;font-weight:600;color:var(--navy);letter-spacing:.01em}
+.card-body{padding:18px 20px;display:flex;flex-direction:column;gap:16px}
+
+/* ── FIELDS ───────────────────────────────── */
+.field{display:flex;flex-direction:column;gap:5px}
+.label{font-size:13px;font-weight:500;color:var(--text2)}
+.req{color:var(--red)}
+
+input[type=text],textarea,select{
+  font-family:var(--font);font-size:15px;color:var(--text);
+  background:#FAFBFC;border:1.5px solid var(--border);
+  border-radius:var(--r);padding:11px 14px;
+  width:100%;outline:none;
+  transition:border-color var(--tr),box-shadow var(--tr),background var(--tr);
+  appearance:none;-webkit-appearance:none;
+}
+input[type=text]:focus,textarea:focus,select:focus{
+  border-color:var(--border-f);box-shadow:0 0 0 3px rgba(28,43,74,.1);background:#fff;
+}
+input.is-ok {border-color:var(--green);background:var(--green-bg)}
+input.is-err,textarea.is-err,select.is-err{
+  border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08);
+}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+textarea{resize:vertical;min-height:108px;line-height:1.6}
+
+.field-foot{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-height:18px}
+.err-msg{font-size:12px;font-weight:500;color:var(--red);flex:1}
+.char{font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* ── SELECT + SCANNER ROW ─────────────────── */
+.local-row{display:flex;gap:0;align-items:stretch}
+.sel-wrap{position:relative;flex:1}
+/* Input de busca do local (substitui o select) */
+.sel-wrap input[type=text]{
+  border-radius:var(--r) 0 0 var(--r);
+  border-right:none;
+}
+.sel-wrap input.is-ok{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:600}
+.btn-scan{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:0 14px;background:var(--navy);color:#fff;
+  border:1.5px solid var(--navy);
+  border-radius:0 var(--r) var(--r) 0;
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:background var(--tr);-webkit-tap-highlight-color:transparent;
+}
+.btn-scan:hover{background:var(--navy-d)}
+.btn-scan:active{transform:scale(.97)}
+.btn-scan svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn-scan.scanning{background:#059669;border-color:#059669;animation:scanpulse 1.2s infinite}
+@keyframes scanpulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── CHIP LOCAL ───────────────────────────── */
+.local-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--green-bg);border:1px solid var(--green-bd);
+  border-radius:var(--r);padding:9px 12px;
+  animation:fadein .2s ease both;
+}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.chip-icon{color:var(--green);font-weight:700;font-size:13px;flex-shrink:0}
+.chip-txt{font-size:13px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-badge{
+  font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;flex-shrink:0;
+}
+.badge-list{background:#DBEAFE;color:#1E40AF}
+.badge-scan{background:#EDE9FE;color:#5B21B6}
+.badge-url {background:#FEF3C7;color:#92400E}
+
+/* ── PRIORIDADE ───────────────────────────── */
+.prio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.p-opt{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 6px;border:1.5px solid var(--border);border-radius:var(--r);
+  background:#FAFBFC;cursor:pointer;font-family:var(--font);
+  transition:all var(--tr);-webkit-tap-highlight-color:transparent;
+}
+.p-opt:hover{border-color:var(--navy);background:#fff}
+.p-opt:active{transform:scale(.96)}
+.p-dot{width:10px;height:10px;border-radius:50%;display:block;transition:transform var(--tr)}
+.p-opt[data-p="1"] .p-dot{background:#EF4444}
+.p-opt[data-p="2"] .p-dot{background:#F97316}
+.p-opt[data-p="3"] .p-dot{background:#EAB308}
+.p-opt[data-p="4"] .p-dot{background:#22C55E}
+.p-lbl{font-size:11px;font-weight:500;color:var(--text2);text-align:center;line-height:1.2}
+
+.p-opt[aria-pressed=true][data-p="1"]{background:var(--p1-bg);border-color:var(--p1-bd)}.p-opt[aria-pressed=true][data-p="1"] .p-lbl{color:var(--p1-tx);font-weight:600}
+.p-opt[aria-pressed=true][data-p="2"]{background:var(--p2-bg);border-color:var(--p2-bd)}.p-opt[aria-pressed=true][data-p="2"] .p-lbl{color:var(--p2-tx);font-weight:600}
+.p-opt[aria-pressed=true][data-p="3"]{background:var(--p3-bg);border-color:var(--p3-bd)}.p-opt[aria-pressed=true][data-p="3"] .p-lbl{color:var(--p3-tx);font-weight:600}
+.p-opt[aria-pressed=true][data-p="4"]{background:var(--p4-bg);border-color:var(--p4-bd)}.p-opt[aria-pressed=true][data-p="4"] .p-lbl{color:var(--p4-tx);font-weight:600}
+.p-opt[aria-pressed=true] .p-dot{transform:scale(1.35)}
+
+/* ── BOTÕES ───────────────────────────────── */
+.form-actions{display:flex;gap:10px}
+.btn{
+  font-family:var(--font);font-size:14px;font-weight:600;
+  border:none;border-radius:var(--r);padding:13px 20px;
+  cursor:pointer;transition:all var(--tr);
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  -webkit-tap-highlight-color:transparent;letter-spacing:.01em;
+}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-primary{flex:1;background:var(--navy);color:#fff}
+.btn-primary:not(:disabled):hover{background:var(--navy-d);transform:translateY(-1px);box-shadow:0 4px 14px rgba(28,43,74,.28)}
+.btn-primary:not(:disabled):active{transform:scale(.98);box-shadow:none}
+.btn-ghost{background:#fff;color:var(--text2);border:1.5px solid var(--border);padding:13px 16px}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CAMPO DE FOTOS ───────────────────────── */
+.foto-drop{
+  border:2px dashed var(--border);border-radius:var(--r);
+  padding:22px 16px;text-align:center;cursor:pointer;
+  transition:border-color var(--tr),background var(--tr);
+  background:#FAFBFC;
+}
+.foto-drop:hover,.foto-drop.drag-over{
+  border-color:var(--navy);background:#F0F4FF;
+}
+.foto-drop-icon{font-size:28px;margin-bottom:6px;display:block}
+.foto-drop-txt{font-size:14px;font-weight:500;color:var(--text2)}
+.foto-drop-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.foto-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;
+}
+.foto-item{
+  position:relative;border-radius:var(--r);overflow:hidden;
+  aspect-ratio:1;background:var(--bg);border:1px solid var(--border);
+}
+.foto-item img{width:100%;height:100%;object-fit:cover;display:block}
+.foto-remove{
+  position:absolute;top:5px;right:5px;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;
+  border:none;cursor:pointer;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--tr);line-height:1;
+}
+.foto-remove:hover{background:rgba(220,38,38,.85)}
+.foto-counter{font-size:11px;color:var(--text3);text-align:right;margin-top:4px}
+
+/* ── TELA SUCESSO ─────────────────────────── */
+.success-wrap{
+  width:100%;max-width:620px;padding:20px 18px 0;
+  animation:fadein .3s ease both;
+}
+.success-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:32px 24px;
+  box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
+}
+.s-icon{
+  width:60px;height:60px;border-radius:50%;
+  background:var(--green-bg);border:2px solid var(--green-bd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:var(--green);font-weight:700;
+}
+.s-title{font-size:21px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.s-sub{font-size:14px;color:var(--text2);line-height:1.6;max-width:320px}
+.protocol-box{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 18px;text-align:left;
+}
+.proto-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.proto-val{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:.03em}
+.summary{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;text-align:left;
+}
+.s-row{display:flex;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.s-row:last-child{border-bottom:none}
+.s-key{font-weight:600;color:var(--text3);min-width:90px;flex-shrink:0;font-size:12px;padding-top:1px}
+.s-val{color:var(--text);line-height:1.5;word-break:break-word}
+.s-actions{display:flex;gap:10px;width:100%}
+
+/* ── MODAL CÂMERA ─────────────────────────── */
+.cam-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.93);
+  z-index:500;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;padding:24px;
+}
+.cam-title{font-size:17px;font-weight:600;color:#fff;text-align:center}
+.cam-sub{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-top:4px}
+.cam-frame{
+  position:relative;width:min(300px,88vw);height:min(300px,88vw);
+  border-radius:var(--r-lg);overflow:hidden;background:#000;
+}
+.scan-line{
+  position:absolute;left:8%;width:84%;height:2px;
+  background:linear-gradient(90deg,transparent,#6EE7B7,transparent);
+  z-index:3;animation:scanmove 1.8s linear infinite;box-shadow:0 0 8px #6EE7B7;
+}
+@keyframes scanmove{0%{top:8%;opacity:1}88%{top:88%;opacity:1}100%{top:88%;opacity:0}}
+.cam-corners{position:absolute;inset:12px;z-index:4;pointer-events:none}
+.cam-corners::before,.cam-corners::after,.cam-corners span::before,.cam-corners span::after{
+  content:'';position:absolute;width:24px;height:24px;
+  border-color:#6EE7B7;border-style:solid;border-width:0;
+}
+.cam-corners::before {top:0;left:0; border-top-width:3px;border-left-width:3px; border-radius:3px 0 0 0}
+.cam-corners::after  {top:0;right:0;border-top-width:3px;border-right-width:3px;border-radius:0 3px 0 0}
+.cam-corners span::before{bottom:0;left:0; border-bottom-width:3px;border-left-width:3px; border-radius:0 0 0 3px}
+.cam-corners span::after {bottom:0;right:0;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 3px 0}
+video#camVideo{width:100%;height:100%;object-fit:cover;display:block}
+canvas#camCanvas{display:none}
+.cam-status{font-size:13px;color:rgba(255,255,255,.5);text-align:center;min-height:20px;transition:color .2s}
+.cam-status.found{color:#6EE7B7;font-weight:600;font-size:15px}
+
+/* ── TOAST ────────────────────────────────── */
+.toast{
+  position:fixed;bottom:22px;left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--text);color:#fff;
+  font-size:13px;font-weight:500;
+  padding:10px 20px;border-radius:40px;
+  z-index:9999;transition:transform .28s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.22);
+  white-space:nowrap;max-width:calc(100vw - 32px);
+  overflow:hidden;text-overflow:ellipsis;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── UTILS ────────────────────────────────── */
+.hidden{display:none!important}
+@media(max-width:420px){
+  .prio-grid{grid-template-columns:repeat(2,1fr)}
+  .btn-scan-lbl{display:none}
+  .s-actions{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <span class="t-dot"></span>
+      <span class="t-title">Notificação de Manutenção</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="t-badge">IW21</span>
+      <button type="button" id="btnVerRegistros"
+        style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;
+               color:rgba(255,255,255,.8);font-family:var(--font);font-size:12px;font-weight:500;
+               padding:4px 10px;cursor:pointer;white-space:nowrap">
+        📂 Registros
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- BANNER LOCAL -->
+<div class="local-banner hidden" id="localBanner">
+  <div class="banner-card">
+    <div>
+      <p class="b-lbl">📍 Local de Instalação</p>
+      <p class="b-code" id="bCode">—</p>
+      <p class="b-desc" id="bDesc"></p>
+    </div>
+    <span class="b-icon">🏭</span>
+  </div>
+</div>
+
+<!-- FORMULÁRIO -->
+<main class="main" id="formMain">
+  <form id="mainForm" novalidate autocomplete="off">
+
+    <!-- ── Identificação ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="head-icon">📋</div>
+        <span class="head-title">Identificação</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Título -->
+        <div class="field">
+          <label class="label" for="fTitulo">Título da Nota <span class="req">*</span></label>
+          <input type="text" id="fTitulo" list="tituloList" maxlength="40"
+            placeholder="Selecione uma sugestão ou descreva o problema…"
+            autocomplete="off"/>
+          <datalist id="tituloList">
+            <!-- ══ EDITE AS SUGESTÕES DE TÍTULO ══ -->
+            <option value="FALHA MECÂNICA — EQUIPAMENTO PARADO"></option>
+            <option value="FALHA ELÉTRICA — SEM ENERGIA"></option>
+            <option value="VAZAMENTO IDENTIFICADO"></option>
+            <option value="RUÍDO ANORMAL EM OPERAÇÃO"></option>
+            <option value="SUPERAQUECIMENTO DE COMPONENTE"></option>
+            <option value="VIBRAÇÃO EXCESSIVA"></option>
+            <option value="FALHA DE INSTRUMENTO / SENSOR"></option>
+            <option value="PREVENTIVA — TROCA DE COMPONENTE"></option>
+            <option value="INSPEÇÃO SOLICITADA"></option>
+            <option value="DANO FÍSICO — COLISÃO OU IMPACTO"></option>
+            <option value="CORROSÃO IDENTIFICADA"></option>
+            <option value="TROCA DE ÓLEO / LUBRIFICAÇÃO"></option>
+          </datalist>
+          <div class="field-foot">
+            <span class="err-msg hidden" id="eTitulo">Informe um título com pelo menos 5 caracteres.</span>
+            <span class="char" id="cTitulo">0 / 40</span>
+          </div>
+        </div>
+
+        <!-- Local de Instalação -->
+        <div class="field">
+          <label class="label" for="fLocalInput">Local de Instalação <span class="req">*</span></label>
+          <div class="local-row">
+            <div class="sel-wrap">
+              <!--
+                COMO FUNCIONA O DATALIST:
+                O <input> aceita digitação livre E mostra sugestões da lista abaixo.
+                O usuário digita "PR" e só aparecem os locais que contêm "PR".
+                O value do <option> deve ser exatamente o código — é o que será salvo.
+                Adicione quantos locais quiser no formato abaixo.
+              -->
+              <input
+                type="text"
+                id="fLocalInput"
+                list="localList"
+                placeholder="Digite o código ou descrição do local…"
+                autocomplete="off"
+              />
+              <datalist id="localList">
+                <!-- ══ EDITE OS LOCAIS ABAIXO — copie da exportação IH08 ══ -->
+                <option value="1000-PR-001">1000-PR-001 — Linha de Produção A</option>
+                <option value="1000-PR-002">1000-PR-002 — Linha de Produção B</option>
+                <option value="1000-PR-003">1000-PR-003 — Compressor Central</option>
+                <option value="2000-UT-001">2000-UT-001 — Caldeira Principal</option>
+                <option value="2000-UT-002">2000-UT-002 — Torre de Resfriamento</option>
+                <option value="2000-UT-003">2000-UT-003 — Subestação Elétrica</option>
+                <option value="3000-AR-001">3000-AR-001 — Empilhadeira 01</option>
+                <option value="3000-AR-002">3000-AR-002 — Esteira de Expedição</option>
+              </datalist>
+            </div>
+            <button type="button" class="btn-scan" id="btnScan" title="Ler QR Code">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <polyline points="14 16 16 16 16 14"/>
+                <polyline points="16 21 21 21 21 16"/>
+                <line x1="21" y1="14" x2="21.01" y2="14"/>
+                <line x1="14" y1="21" x2="14.01" y2="21"/>
+              </svg>
+              <span class="btn-scan-lbl">QR</span>
+            </button>
+          </div>
+          <!-- Chip de confirmação -->
+          <div class="local-chip hidden" id="localChip">
+            <span class="chip-icon">✓</span>
+            <span class="chip-txt" id="chipTxt"></span>
+            <span class="chip-badge" id="chipBadge"></span>
+          </div>
+          <input type="hidden" id="fLocal"/>
+          <span class="err-msg hidden" id="eLocal">Selecione ou digite o local de instalação.</span>
+        </div>
+
+        <!-- Notificador -->
+        <div class="field">
+          <label class="label" for="fNotif">Notificador <span class="req">*</span></label>
+          <input type="text" id="fNotif" placeholder="Nome completo ou matrícula" maxlength="80"/>
+          <span class="err-msg hidden" id="eNotif">Informe o nome ou matrícula do notificador.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Prioridade ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="head-icon">⚡</div>
+        <span class="head-title">Prioridade</span>
+      </div>
+      <div class="card-body">
+        <div class="prio-grid">
+          <button type="button" class="p-opt" data-p="1" aria-pressed="false">
+            <span class="p-dot"></span><span class="p-lbl">Muito Alta</span>
+          </button>
+          <button type="button" class="p-opt" data-p="2" aria-pressed="false">
+            <span class="p-dot"></span><span class="p-lbl">Alta</span>
+          </button>
+          <button type="button" class="p-opt" data-p="3" aria-pressed="false">
+            <span class="p-dot"></span><span class="p-lbl">Média</span>
+          </button>
+          <button type="button" class="p-opt" data-p="4" aria-pressed="false">
+            <span class="p-dot"></span><span class="p-lbl">Baixa</span>
+          </button>
+        </div>
+        <input type="hidden" id="fPrio"/>
+        <span class="err-msg hidden" id="ePrio">Selecione a prioridade.</span>
+      </div>
+    </div>
+
+    <!-- ── Descrição ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="head-icon">📝</div>
+        <span class="head-title">Descrição da Ocorrência</span>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label class="label" for="fDesc">Detalhe o problema <span class="req">*</span></label>
+          <textarea id="fDesc" maxlength="1000" rows="5"
+            placeholder="Descreva o problema observado, sintomas, condições de operação, horário do evento…"></textarea>
+          <div class="field-foot">
+            <span class="err-msg hidden" id="eDesc">Descreva o problema com pelo menos 10 caracteres.</span>
+            <span class="char" id="cDesc">0 / 1000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Fotos ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="head-icon">📷</div>
+        <span class="head-title">Fotos da Ocorrência</span>
+      </div>
+      <div class="card-body">
+
+        <!--
+          INPUT FILE OCULTO
+          accept="image/*" → aceita qualquer imagem
+          capture="environment" → abre câmera traseira no celular diretamente
+          multiple → permite selecionar mais de uma da galeria
+          Quando o usuário clica na área de drop, acionamos este input via JS.
+        -->
+        <input type="file" id="fFotoInput" accept="image/*" multiple style="display:none"/>
+
+        <!-- Área de arrastar ou clicar -->
+        <div class="foto-drop" id="fotoDrop">
+          <span class="foto-drop-icon">📷</span>
+          <p class="foto-drop-txt">Toque para tirar foto ou selecionar da galeria</p>
+          <p class="foto-drop-sub">JPEG, PNG · até 10 MB por foto · câmera ou galeria</p>
+        </div>
+
+        <!-- Botões separados: câmera e galeria (mobile) -->
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" class="btn btn-ghost" id="btnCamera"
+            style="flex:1;font-size:13px;padding:10px 12px">
+            📸 Câmera
+          </button>
+          <button type="button" class="btn btn-ghost" id="btnGaleria"
+            style="flex:1;font-size:13px;padding:10px 12px">
+            🖼 Galeria
+          </button>
+        </div>
+
+        <!-- Grid de previews -->
+        <div class="foto-grid hidden" id="fotoGrid"></div>
+        <p class="foto-counter hidden" id="fotoCounter">0 fotos</p>
+
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" id="btnSubmit">
+        <span id="btnTxt">Registrar Notificação</span>
+        <span class="spinner hidden" id="btnSpinner"></span>
+      </button>
+      <button type="button" class="btn btn-ghost" id="btnReset">Limpar</button>
+    </div>
+
+  </form>
+</main>
+
+<!-- TELA DE SUCESSO -->
+<div class="success-wrap hidden" id="successWrap">
+  <div class="success-card">
+    <div class="s-icon">✓</div>
+    <h2 class="s-title">Notificação Registrada!</h2>
+    <p class="s-sub">Registro salvo com sucesso. Use o protocolo abaixo para acompanhamento.</p>
+    <div class="protocol-box">
+      <p class="proto-lbl">Protocolo</p>
+      <p class="proto-val" id="protoVal">—</p>
+    </div>
+    <div class="summary" id="summaryBox"></div>
+    <div class="s-actions">
+      <button type="button" class="btn btn-primary" id="btnNova">Nova Notificação</button>
+      <button type="button" class="btn btn-ghost" id="btnCopy">Copiar Resumo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CÂMERA -->
+<div class="cam-overlay hidden" id="camOverlay">
+  <div style="text-align:center">
+    <p class="cam-title">Aponte para o QR Code do Local</p>
+    <p class="cam-sub">Posicione o código dentro da moldura</p>
+  </div>
+  <div class="cam-frame">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <canvas id="camCanvas"></canvas>
+    <div class="scan-line"></div>
+    <div class="cam-corners"><span></span></div>
+  </div>
+  <p class="cam-status" id="camStatus">Iniciando câmera…</p>
+  <button type="button" class="btn btn-ghost" id="btnCamClose"
+    style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)">
+    Cancelar
+  </button>
+</div>
+
+<!-- PAINEL DE REGISTROS SALVOS -->
+<div class="success-wrap hidden" id="registrosWrap">
+  <div class="success-card" style="align-items:stretch;text-align:left;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <h2 class="s-title" style="font-size:18px">📂 Registros Salvos</h2>
+      <button type="button" class="btn btn-ghost" id="btnFecharRegistros" style="padding:8px 14px;font-size:13px">← Voltar</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.5">
+      Estes registros estão salvos no <strong>localStorage</strong> do seu navegador —
+      ficam neste dispositivo e somem se limpar os dados do navegador.
+      No SharePoint, ficam em uma lista acessível por qualquer pessoa da empresa.
+    </p>
+
+    <!-- Explicação SharePoint -->
+    <details style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <summary style="padding:12px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--navy);
+                      background:var(--bg);list-style:none;display:flex;align-items:center;gap:8px">
+        ☁️ Como funciona no SharePoint?
+      </summary>
+      <div style="padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;display:flex;flex-direction:column;gap:10px">
+        <p>O SharePoint é como uma "pasta na nuvem" da sua empresa dentro do Microsoft 365. Você cria uma <strong>Lista</strong> (parecida com uma tabela do Excel) e cada notificação vira uma linha nessa lista.</p>
+        <p><strong>O que acontece quando alguém envia o formulário:</strong></p>
+        <ol style="padding-left:18px;display:flex;flex-direction:column;gap:6px">
+          <li>O JavaScript do formulário monta um "pacote de dados" com todos os campos preenchidos.</li>
+          <li>Esse pacote é enviado via <strong>API REST</strong> (uma chamada de internet) direto para a lista do SharePoint.</li>
+          <li>O SharePoint confirma que salvou e o formulário mostra a tela de sucesso com o protocolo.</li>
+          <li>Qualquer pessoa com acesso à lista no SharePoint vê o registro em tempo real.</li>
+        </ol>
+        <p><strong>Para ativar:</strong> altere <code style="background:var(--bg);padding:1px 5px;border-radius:3px">persistencia: 'local'</code> para <code style="background:var(--bg);padding:1px 5px;border-radius:3px">persistencia: 'sharepoint'</code> no bloco CONFIG do arquivo e preencha a URL do seu site.</p>
+      </div>
+    </details>
+
+    <div id="listaRegistros" style="display:flex;flex-direction:column;gap:8px">
+      <p style="font-size:13px;color:var(--text3);text-align:center;padding:16px">Carregando…</p>
+    </div>
+
+    <button type="button" class="btn btn-ghost" id="btnLimparRegistros"
+      style="border-color:#FECACA;color:var(--red);font-size:13px">
+      🗑 Limpar todos os registros locais
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIGURAÇÃO — edite aqui sem tocar no restante
+═══════════════════════════════════════════════════════ */
+const CONFIG = {
+  /*
+    ══════════════════════════════════════════════════════
+    ESTRATÉGIA DE PERSISTÊNCIA — altere apenas esta linha:
+
+    'sharepoint'   → API REST direta do SharePoint
+                     ✓ RECOMENDADO quando o arquivo estiver
+                       hospedado dentro do SharePoint
+                     ✓ Não precisa de licença Premium
+                     ✓ Usa o login M365 já ativo no navegador
+
+    'local'        → localStorage do navegador
+                     Use apenas para testes no computador
+
+    'powerautomate'→ Power Automate via webhook HTTP
+                     Requer licença Premium do Power Automate
+    ══════════════════════════════════════════════════════
+  */
+  persistencia: 'sharepoint',
+
+  sharepoint: {
+    // ↓ Substitua pela URL do SEU site SharePoint
+    siteUrl:        'https://suaempresa.sharepoint.com/sites/manutencao',
+    // ↓ Nome exato da lista que você criar no SharePoint
+    listaNome:      'NotificacoesIW21',
+    // ↓ Nome da biblioteca de documentos para as fotos
+    bibliotecaFotos:'NotificacoesFotos',
+  },
+
+  powerautomate: {
+    webhookUrl: 'COLE_AQUI_A_URL_DO_SEU_FLUXO_POWER_AUTOMATE',
+  },
+
+  prioridades: { 1:'Muito Alta', 2:'Alta', 3:'Média', 4:'Baixa' },
+
+  locais: {
+    '1000-PR-001': 'Linha de Produção A',
+    '1000-PR-002': 'Linha de Produção B',
+    '1000-PR-003': 'Compressor Central',
+    '2000-UT-001': 'Caldeira Principal',
+    '2000-UT-002': 'Torre de Resfriamento',
+    '2000-UT-003': 'Subestação Elétrica',
+    '3000-AR-001': 'Empilhadeira 01',
+    '3000-AR-002': 'Esteira de Expedição',
+  },
+};
+
+/* ═══════════════════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════════════════ */
+const state = {
+  localCodigo:'', localDesc:'', localOrigem:'',
+  localTemp: false, prioridade:'',
+  enviando: false, ultimoResumo:'',
+  fotos: [],   // array de strings base64 — cada foto é uma string "data:image/jpeg;base64,..."
+};
+
+/* ═══════════════════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+
+function safeDecodeURI(s) {
+  try { return decodeURIComponent(s); } catch(_) { return s; }
+}
+
+function gerarProtocolo() {
+  const n = new Date();
+  const pad = v => String(v).padStart(2,'0');
+  const d = `${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}`;
+  const h = `${pad(n.getHours())}${pad(n.getMinutes())}`;
+  const r = Math.random().toString(36).substring(2,6).toUpperCase();
+  return `IW21-${d}-${h}-${r}`;
+}
+
+let _toast;
+function toast(msg, dur=3200) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show'); el.classList.remove('hidden');
+  clearTimeout(_toast);
+  _toast = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+function showErr(id, show=true) {
+  const el = $(id);
+  if (!el) return;
+  el.classList.toggle('hidden', !show);
+}
+
+function markErr(id, errId, show=true) {
+  const el = $(id);
+  if (el) el.classList.toggle('is-err', show);
+  showErr(errId, show);
+}
+
+function clearErrs() {
+  document.querySelectorAll('.is-err').forEach(e => e.classList.remove('is-err'));
+  document.querySelectorAll('.err-msg').forEach(e => e.classList.add('hidden'));
+}
+
+function updateChar(inputId, counterId, max) {
+  const el = $(inputId);
+  const co = $(counterId);
+  if (!el || !co) return;
+  const n = el.value.length;
+  co.textContent = `${n} / ${max}`;
+  co.style.color = n >= max * .9 ? 'var(--red)' : 'var(--text3)';
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOCAL — usa input+datalist (busca por digitação)
+═══════════════════════════════════════════════════════ */
+
+/*
+  COMO O DATALIST FUNCIONA NO JS:
+  - O usuário digita no input; o navegador filtra as sugestões automaticamente.
+  - Quando ele escolhe uma sugestão, o input recebe o value da <option> (o código).
+  - Nós escutamos o evento 'change' e 'input' para detectar quando um local válido
+    foi escolhido — verificamos se o texto digitado existe no CONFIG.locais.
+  - O campo oculto #fLocal guarda sempre o código limpo que será salvo.
+*/
+function applyLocal(codigo, origem) {
+  codigo = safeDecodeURI(codigo).trim();
+  if (!codigo) return;
+
+  // Extrai só o código se o usuário digitou "CODIGO — Descrição"
+  const codigoPuro = codigo.split('—')[0].trim();
+  const desc = CONFIG.locais[codigoPuro] || '';
+
+  state.localCodigo = codigoPuro;
+  state.localDesc   = desc;
+  state.localOrigem = origem;
+
+  // Campo oculto (valor real salvo)
+  $('fLocal').value = codigoPuro;
+
+  // Atualiza o input visível com o código limpo
+  const inp = $('fLocalInput');
+  if (inp) { inp.value = codigoPuro; inp.classList.add('is-ok'); }
+
+  // Banner
+  $('bCode').textContent = codigoPuro;
+  $('bDesc').textContent = desc;
+  $('localBanner').classList.remove('hidden');
+
+  // Chip de confirmação
+  $('chipTxt').textContent = desc ? `${codigoPuro} — ${desc}` : codigoPuro;
+  const badge = $('chipBadge');
+  const map = { lista:'list', qr:'scan', url:'url' };
+  badge.className   = `chip-badge badge-${map[origem]||'list'}`;
+  badge.textContent = origem === 'qr' ? 'QR Code' : origem === 'url' ? 'URL' : 'Digitado';
+  $('localChip').classList.remove('hidden');
+
+  markErr('fLocalInput','eLocal', false);
+}
+
+function removeTemp(sel) {
+  // mantido para compatibilidade — não usado com datalist
+}
+
+function clearLocal() {
+  state.localCodigo = ''; state.localDesc = ''; state.localOrigem = ''; state.localTemp = false;
+  $('fLocal').value = '';
+  $('localBanner').classList.add('hidden');
+  $('localChip').classList.add('hidden');
+  const inp = $('fLocalInput');
+  if (inp) { inp.value = ''; inp.classList.remove('is-ok','is-err'); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCANNER QR
+═══════════════════════════════════════════════════════ */
+let _stream=null, _raf=null, _scanActive=false;
+
+function openScanner() {
+  if (_scanActive) return;
+  if (!navigator.mediaDevices?.getUserMedia) {
+    toast('⚠ Câmera não suportada neste navegador.');
+    return;
+  }
+  if (typeof jsQR !== 'function') {
+    toast('⚠ Biblioteca jsQR não carregada.');
+    return;
+  }
+
+  _scanActive = true;
+  $('btnScan').classList.add('scanning');
+  $('camStatus').textContent = 'Solicitando câmera…';
+  $('camStatus').classList.remove('found');
+  $('camOverlay').classList.remove('hidden');
+
+  navigator.mediaDevices.getUserMedia({
+    video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} }
+  })
+  .then(stream => {
+    _stream = stream;
+    const v = $('camVideo');
+    v.srcObject = stream;
+    v.play();
+    v.addEventListener('loadedmetadata', () => {
+      $('camStatus').textContent = 'Câmera ativa — aguardando QR Code…';
+      _raf = requestAnimationFrame(scanFrame);
+    }, {once:true});
+  })
+  .catch(err => {
+    closeScanner();
+    const msgs = {
+      NotAllowedError: 'Permissão negada. Verifique as configurações do navegador.',
+      NotFoundError:   'Nenhuma câmera encontrada.',
+      NotReadableError:'Câmera em uso por outro app.',
+    };
+    toast(`⚠ ${msgs[err.name] || 'Câmera indisponível.'}`);
+  });
+}
+
+function scanFrame() {
+  const v = $('camVideo'), c = $('camCanvas');
+  if (v.readyState < v.HAVE_ENOUGH_DATA) { _raf = requestAnimationFrame(scanFrame); return; }
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(v, 0, 0, c.width, c.height);
+  const img  = ctx.getImageData(0, 0, c.width, c.height);
+  const code = jsQR(img.data, img.width, img.height, {inversionAttempts:'dontInvert'});
+  if (code) { onQRFound(code.data); return; }
+  _raf = requestAnimationFrame(scanFrame);
+}
+
+function onQRFound(raw) {
+  let local = raw;
+  try {
+    const url = new URL(raw);
+    const p   = url.searchParams.get('local');
+    if (p) local = p;
+  } catch(_) {}
+
+  const st = $('camStatus');
+  st.classList.add('found');
+  st.textContent = `✓ Local lido: ${local}`;
+  if (navigator.vibrate) navigator.vibrate([80,40,80]);
+
+  setTimeout(() => {
+    closeScanner();
+    applyLocal(local, 'qr');
+    toast(`📍 Local preenchido: ${local}`);
+  }, 700);
+}
+
+function closeScanner() {
+  cancelAnimationFrame(_raf); _raf = null;
+  if (_stream) { _stream.getTracks().forEach(t => t.stop()); _stream = null; }
+  $('camVideo').srcObject = null;
+  $('camOverlay').classList.add('hidden');
+  $('btnScan').classList.remove('scanning');
+  _scanActive = false;
+}
+
+/* ═══════════════════════════════════════════════════════
+   VALIDAÇÃO
+═══════════════════════════════════════════════════════ */
+function validate() {
+  clearErrs();
+  let ok = true, first = null;
+
+  const titulo = $('fTitulo').value.trim();
+  if (titulo.length < 5) {
+    markErr('fTitulo','eTitulo'); ok=false; first=first||$('fTitulo');
+  }
+
+  const local = $('fLocal').value.trim();
+  if (!local) {
+    markErr('fLocalInput','eLocal'); ok=false; first=first||$('fLocalInput');
+  }
+
+  const notif = $('fNotif').value.trim();
+  if (notif.length < 3) {
+    markErr('fNotif','eNotif'); ok=false; first=first||$('fNotif');
+  }
+
+  const prio = $('fPrio').value;
+  if (!prio) {
+    showErr('ePrio'); ok=false;
+  }
+
+  const desc = $('fDesc').value.trim();
+  if (desc.length < 10) {
+    markErr('fDesc','eDesc'); ok=false; first=first||$('fDesc');
+  }
+
+  first?.scrollIntoView({behavior:'smooth', block:'center'});
+  return ok;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PERSISTÊNCIA
+═══════════════════════════════════════════════════════ */
+async function salvar(payload) {
+  switch (CONFIG.persistencia) {
+    case 'powerautomate': return salvarPowerAutomate(payload);
+    case 'sharepoint':    return salvarSharePoint(payload);
+    case 'googlesheets':  return salvarSheets(payload);
+    default:              return salvarLocal(payload);
+  }
+}
+
+/*
+  POWER AUTOMATE — como funciona:
+  1. Você cria um fluxo no Power Automate com gatilho "Quando uma solicitação HTTP é recebida"
+  2. O Power Automate gera uma URL única para esse fluxo
+  3. O formulário envia os dados para essa URL via POST (formato JSON)
+  4. O Power Automate recebe, processa e salva onde você configurou
+     (SharePoint List, Excel, e-mail, Teams, tudo ao mesmo tempo)
+
+  Vantagem: o Power Automate roda na nuvem da Microsoft — o formulário pode
+  estar em qualquer lugar (celular, GitHub Pages, SharePoint) e os dados
+  chegam sempre. Não precisa de servidor próprio.
+*/
+async function salvarPowerAutomate(payload) {
+  const url = CONFIG.powerautomate.webhookUrl;
+
+  if (!url || url.startsWith('COLE_AQUI')) {
+    throw new Error(
+      'URL do Power Automate não configurada.\n' +
+      'Abra o arquivo, encontre CONFIG.powerautomate.webhookUrl e cole a URL do seu fluxo.\n' +
+      'Veja o guia GUIA-POWER-AUTOMATE.md para criar o fluxo.'
+    );
+  }
+
+  // Monta o corpo da requisição — apenas campos de texto (sem fotos em base64)
+  // As fotos ficam como quantidade; o envio de arquivos binários via Power Automate
+  // requer configuração adicional de biblioteca de documentos no fluxo
+  const corpo = {
+    Protocolo:         payload.ID,
+    DataHoraCriacao:   payload.DataHoraCriacao,
+    TituloNota:        payload.TituloNota,
+    LocalInstalacao:   payload.LocalInstalacao,
+    DescricaoLocal:    payload.DescricaoLocal,
+    OrigemLocal:       payload.OrigemLocal,
+    Prioridade:        payload.PrioridadeLabel,
+    Notificador:       payload.Notificador,
+    DescricaoProblema: payload.DescricaoProblema,
+    StatusRegistro:    payload.StatusRegistro,
+    CanalOrigem:       payload.CanalOrigem,
+    QtdFotos:          payload.QtdFotos || 0,
+    // Fotos em base64 incluídas para o Power Automate salvar na biblioteca
+    Fotos:             payload.Fotos || [],
+  };
+
+  const res = await fetch(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(corpo),
+  });
+
+  // Power Automate retorna 202 Accepted (não 200) quando recebe com sucesso
+  if (!res.ok && res.status !== 202) {
+    throw new Error(`Power Automate retornou erro ${res.status}. Verifique se o fluxo está ativo.`);
+  }
+}
+
+function salvarLocal(payload) {
+  localStorage.setItem(`iw21_${payload.ID}`, JSON.stringify(payload));
+  const idx = JSON.parse(localStorage.getItem('iw21_index')||'[]');
+  idx.push(payload.ID);
+  localStorage.setItem('iw21_index', JSON.stringify(idx));
+}
+
+async function salvarSharePoint(payload) {
+  const { siteUrl, listaNome, bibliotecaFotos } = CONFIG.sharepoint;
+
+  if (!siteUrl || siteUrl.includes('suaempresa')) {
+    throw new Error(
+      'URL do SharePoint não configurada.\n' +
+      'Abra o arquivo HTML, encontre CONFIG.sharepoint.siteUrl\n' +
+      'e substitua pela URL do seu site SharePoint.'
+    );
+  }
+
+  // ── Obter token CSRF do SharePoint ──────────────────────────────────────
+  // O SharePoint exige este token para qualquer gravação.
+  // Ele vem automaticamente do login M365 já ativo no navegador.
+  let digest;
+  try {
+    const drRes = await fetch(`${siteUrl}/_api/contextinfo`, {
+      method: 'POST', credentials: 'include',
+      headers: { Accept: 'application/json;odata=nometadata' },
+    });
+    if (!drRes.ok) throw new Error('status ' + drRes.status);
+    const dj = await drRes.json();
+    digest = dj.FormDigestValue;
+  } catch(e) {
+    throw new Error(
+      'Não foi possível autenticar no SharePoint.\n\n' +
+      'Verifique se:\n' +
+      '1. O arquivo está hospedado dentro do SharePoint\n' +
+      '2. Você está logado no Microsoft 365\n' +
+      '3. A URL em CONFIG.sharepoint.siteUrl está correta\n\n' +
+      'Detalhe técnico: ' + e.message
+    );
+  }
+
+  // ── Salvar item na Lista ─────────────────────────────────────────────────
+  const itemBody = {
+    __metadata:       { type: `SP.Data.${listaNome}ListItem` },
+    Title:            payload.TituloNota,
+    LocalInstalacao:  payload.LocalInstalacao,
+    DescricaoLocal:   payload.DescricaoLocal,
+    OrigemLocal:      payload.OrigemLocal,
+    Prioridade:       payload.PrioridadeLabel,
+    Notificador:      payload.Notificador,
+    DescricaoProblema:payload.DescricaoProblema,
+    StatusRegistro:   payload.StatusRegistro,
+    Protocolo:        payload.ID,
+    DataHoraCriacao:  payload.DataHoraCriacao,
+    QtdFotos:         payload.QtdFotos,
+  };
+
+  const listRes = await fetch(
+    `${siteUrl}/_api/web/lists/getbytitle('${listaNome}')/items`,
+    {
+      method: 'POST', credentials: 'include',
+      headers: {
+        'Accept':          'application/json;odata=nometadata',
+        'Content-Type':    'application/json;odata=nometadata',
+        'X-RequestDigest': digest,
+      },
+      body: JSON.stringify(itemBody),
+    }
+  );
+
+  if (!listRes.ok) {
+    const txt = await listRes.text().catch(() => '');
+    if (listRes.status === 404) {
+      throw new Error(
+        `Lista "${listaNome}" não encontrada no SharePoint.\n` +
+        'Crie a lista com esse nome exato antes de usar o formulário.\n' +
+        'Veja o guia de configuração para as colunas necessárias.'
+      );
+    }
+    throw new Error(`Falha ao salvar na lista SharePoint (${listRes.status}).\n${txt}`);
+  }
+
+  // ── PASSO 3: Upload de cada foto na Biblioteca de Documentos ────────────
+  // As fotos ficam numa pasta nomeada com o protocolo da notificação.
+  // Caminho: /sites/manutencao/NotificacoesFotos/IW21-20240101-1200-ABCD/foto_1.jpg
+  //
+  // Como funciona o upload via SharePoint REST API:
+  //   - Convertemos o base64 de volta para binário (Blob)
+  //   - Enviamos via PUT para a API de arquivos do SharePoint
+  //   - O SharePoint cria o arquivo na biblioteca automaticamente
+  if (payload.Fotos && payload.Fotos.length > 0) {
+    // Cria a pasta do protocolo (ignora erro se já existir)
+    await fetch(
+      `${siteUrl}/_api/web/folders`,
+      {
+        method: 'POST', credentials: 'include',
+        headers: {
+          'Accept':          'application/json;odata=nometadata',
+          'Content-Type':    'application/json;odata=nometadata',
+          'X-RequestDigest': digest,
+        },
+        body: JSON.stringify({
+          __metadata: { type: 'SP.Folder' },
+          ServerRelativeUrl: `/${bibliotecaFotos}/${payload.ID}`,
+        }),
+      }
+    ).catch(() => {}); // pasta pode já existir — não bloqueia
+
+    // Faz upload de cada foto individualmente
+    const errosUpload = [];
+    for (let i = 0; i < payload.Fotos.length; i++) {
+      try {
+        const blob     = base64ToBlob(payload.Fotos[i]);
+        const ext      = blob.type === 'image/png' ? 'png' : 'jpg';
+        const nomeArq  = `foto_${String(i + 1).padStart(2, '0')}.${ext}`;
+        const uploadUrl = `${siteUrl}/_api/web/GetFolderByServerRelativeUrl`
+                        + `('/${bibliotecaFotos}/${payload.ID}')`
+                        + `/Files/add(url='${nomeArq}',overwrite=true)`;
+
+        const upRes = await fetch(uploadUrl, {
+          method: 'POST', credentials: 'include',
+          headers: {
+            'Accept':          'application/json;odata=nometadata',
+            'X-RequestDigest': digest,
+            'Content-Length':  blob.size,
+          },
+          body: blob,
+        });
+
+        if (!upRes.ok) errosUpload.push(nomeArq);
+      } catch (e) {
+        errosUpload.push(`foto_${i + 1}`);
+      }
+    }
+
+    if (errosUpload.length) {
+      // Avisa mas não bloqueia — o registro já foi salvo na lista
+      toast(`⚠ ${errosUpload.length} foto(s) não enviada(s) ao SharePoint.`, 4000);
+    }
+  }
+}
+
+// Converte string base64 ("data:image/jpeg;base64,...") para Blob binário
+// O SharePoint exige o arquivo em binário — não aceita base64 diretamente.
+function base64ToBlob(dataUrl) {
+  const [meta, data] = dataUrl.split(',');
+  const mime  = meta.match(/:(.*?);/)[1];             // ex: "image/jpeg"
+  const bytes = atob(data);                            // decodifica base64 → binário
+  const arr   = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+async function salvarSheets(payload) {
+  await fetch(CONFIG.googlesheets.webAppUrl, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+    mode:'no-cors',
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUBMISSÃO
+═══════════════════════════════════════════════════════ */
+async function handleSubmit(e) {
+  e.preventDefault();
+  if (state.enviando) return;
+
+  // Normaliza título
+  const tEl = $('fTitulo');
+  tEl.value = tEl.value.trim().replace(/\s{2,}/g,' ').toUpperCase();
+  updateChar('fTitulo','cTitulo',40);
+
+  if (!validate()) {
+    toast('⚠ Corrija os campos em destaque antes de enviar.');
+    return;
+  }
+
+  state.enviando = true;
+  $('btnSubmit').disabled = true;
+  $('btnTxt').classList.add('hidden');
+  $('btnSpinner').classList.remove('hidden');
+
+  const protocolo = gerarProtocolo();
+  const payload = {
+    ID:                protocolo,
+    DataHoraCriacao:   new Date().toISOString(),
+    TituloNota:        $('fTitulo').value.trim(),
+    LocalInstalacao:   state.localCodigo,
+    DescricaoLocal:    state.localDesc,
+    OrigemLocal:       state.localOrigem,
+    Prioridade:        $('fPrio').value,
+    PrioridadeLabel:   CONFIG.prioridades[$('fPrio').value]||'',
+    Notificador:       $('fNotif').value.trim(),
+    DescricaoProblema: $('fDesc').value.trim(),
+    StatusRegistro:    'ABERTO',
+    CanalOrigem:       'WebForm',
+    Fotos:             state.fotos,          // array de base64
+    QtdFotos:          state.fotos.length,
+  };
+
+  try {
+    await salvar(payload);
+    showSuccess(protocolo, payload);
+  } catch(err) {
+    toast(`❌ Falha ao registrar: ${err.message}`, 5000);
+  } finally {
+    state.enviando = false;
+    $('btnSubmit').disabled = false;
+    $('btnTxt').classList.remove('hidden');
+    $('btnSpinner').classList.add('hidden');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUCESSO
+═══════════════════════════════════════════════════════ */
+function showSuccess(protocolo, p) {
+  $('protoVal').textContent = protocolo;
+
+  const box = $('summaryBox');
+  box.innerHTML = '';
+
+  const linhas = [
+    ['Título',     p.TituloNota],
+    ['Local',      p.LocalInstalacao + (p.DescricaoLocal ? ` — ${p.DescricaoLocal}` : '')],
+    ['Prioridade', p.PrioridadeLabel],
+    ['Notificador',p.Notificador],
+    ['Descrição',  p.DescricaoProblema],
+    ['Fotos',      p.QtdFotos ? `${p.QtdFotos} foto(s) anexada(s)` : 'Nenhuma'],
+    ['Data/Hora',  new Date(p.DataHoraCriacao).toLocaleString('pt-BR')],
+  ];
+
+  for (const [k,v] of linhas) {
+    const row = document.createElement('div');
+    row.className = 's-row';
+    const key = document.createElement('span');
+    key.className = 's-key'; key.textContent = k;
+    const val = document.createElement('span');
+    val.className = 's-val'; val.textContent = v;
+    row.appendChild(key); row.appendChild(val);
+    box.appendChild(row);
+  }
+
+  // Miniaturas das fotos no resumo de sucesso
+  if (state.fotos.length) {
+    const fotoRow = document.createElement('div');
+    fotoRow.className = 's-row';
+    fotoRow.style.flexDirection = 'column';
+    fotoRow.style.gap = '8px';
+    const fKey = document.createElement('span');
+    fKey.className = 's-key'; fKey.textContent = 'Imagens';
+    const fGrid = document.createElement('div');
+    fGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px';
+    state.fotos.forEach(b64 => {
+      const img = document.createElement('img');
+      img.src = b64;
+      img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;border:1px solid var(--border)';
+      fGrid.appendChild(img);
+    });
+    fotoRow.appendChild(fKey);
+    fotoRow.appendChild(fGrid);
+    box.appendChild(fotoRow);
+  }
+
+  state.ultimoResumo = linhas.map(([k,v]) => `${k.padEnd(12)}: ${v}`).join('\n');
+
+  $('formMain').classList.add('hidden');
+  $('localBanner').classList.add('hidden');
+  $('successWrap').classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════════════════
+   MÓDULO DE FOTOS
+   Converte cada imagem para base64 e armazena em state.fotos.
+   base64 = forma de representar arquivos binários (imagens) como texto.
+   É o que permite guardar a imagem junto com os outros dados (JSON).
+═══════════════════════════════════════════════════════ */
+
+// Limite e estado
+const MAX_FOTOS = Infinity;  // ilimitado
+const MAX_MB    = 10;        // 10 MB por foto para SharePoint
+
+// Inicializado em state (adicionado aqui para centralizar)
+// state.fotos = []  — declarado junto com o restante do estado
+
+function lerArquivosComoBase64(arquivos) {
+  // FileReader converte cada arquivo em base64
+  // É assíncrono (usa Promise) porque ler arquivo demora um instante
+  return Promise.all([...arquivos].map(arquivo => {
+    return new Promise((resolve, reject) => {
+      // Valida tamanho antes de ler
+      if (arquivo.size > MAX_MB * 1024 * 1024) {
+        toast(`⚠ "${arquivo.name}" excede ${MAX_MB} MB — ignorado.`);
+        resolve(null);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload  = e => resolve(e.target.result);  // resultado = string base64
+      reader.onerror = ()  => reject(new Error('Falha ao ler arquivo'));
+      reader.readAsDataURL(arquivo);  // lê como Data URL (inclui "data:image/jpeg;base64,...")
+    });
+  }));
+}
+
+async function adicionarFotos(arquivos) {
+  const base64s = await lerArquivosComoBase64(arquivos);
+  base64s.forEach(b64 => { if (b64) state.fotos.push(b64); });
+  renderFotoGrid();
+}
+
+function renderFotoGrid() {
+  const grid    = $('fotoGrid');
+  const counter = $('fotoCounter');
+  grid.innerHTML = '';
+
+  if (!state.fotos.length) {
+    grid.classList.add('hidden');
+    counter.classList.add('hidden');
+    return;
+  }
+
+  grid.classList.remove('hidden');
+  counter.classList.remove('hidden');
+  counter.textContent = `${state.fotos.length} foto(s) anexada(s)`;
+
+  state.fotos.forEach((b64, idx) => {
+    const item = document.createElement('div');
+    item.className = 'foto-item';
+
+    const img = document.createElement('img');
+    img.src = b64;
+    img.alt = `Foto ${idx + 1}`;
+
+    // Botão de remover — "×" sobre a miniatura
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'foto-remove';
+    btn.textContent = '×';
+    btn.title = 'Remover foto';
+    btn.addEventListener('click', () => {
+      state.fotos.splice(idx, 1);   // remove o item pelo índice
+      renderFotoGrid();
+    });
+
+    item.appendChild(img);
+    item.appendChild(btn);
+    grid.appendChild(item);
+  });
+}
+
+function initFotos() {
+  const drop       = $('fotoDrop');
+  const input      = $('fFotoInput');
+  const btnCamera  = $('btnCamera');
+  const btnGaleria = $('btnGaleria');
+
+  // Clique na área de drop → abre galeria (sem capture)
+  drop.addEventListener('click', () => {
+    input.removeAttribute('capture');
+    input.click();
+  });
+
+  // Botão câmera → abre câmera traseira diretamente (mobile)
+  btnCamera.addEventListener('click', () => {
+    input.setAttribute('capture', 'environment');
+    input.click();
+  });
+
+  // Botão galeria → sem capture = escolhe da galeria
+  btnGaleria.addEventListener('click', () => {
+    input.removeAttribute('capture');
+    input.click();
+  });
+
+  // Quando arquivos são selecionados
+  input.addEventListener('change', async function() {
+    if (this.files.length) await adicionarFotos(this.files);
+    this.value = '';  // limpa para permitir selecionar o mesmo arquivo novamente
+  });
+
+  // Drag and drop (desktop)
+  drop.addEventListener('dragover',  e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', async e => {
+    e.preventDefault();
+    drop.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) await adicionarFotos(e.dataTransfer.files);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════════ */
+function resetForm() {
+  $('fTitulo').value = '';
+  $('fNotif').value  = '';
+  $('fDesc').value   = '';
+  $('fPrio').value   = '';
+  updateChar('fTitulo','cTitulo',40);
+  updateChar('fDesc','cDesc',1000);
+  document.querySelectorAll('.p-opt').forEach(b => b.setAttribute('aria-pressed','false'));
+  state.prioridade = '';
+  state.fotos = [];          // limpa as fotos
+  renderFotoGrid();
+  clearErrs();
+  clearLocal();
+  $('btnScan').classList.remove('scanning');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Inicializa módulo de fotos
+  initFotos();
+
+  // Submit
+  $('mainForm').addEventListener('submit', handleSubmit);
+
+  // Reset
+  $('btnReset').addEventListener('click', resetForm);
+
+  // Contadores
+  $('fTitulo').addEventListener('input', () => {
+    updateChar('fTitulo','cTitulo',40);
+    markErr('fTitulo','eTitulo',false);
+  });
+  $('fDesc').addEventListener('input', () => {
+    updateChar('fDesc','cDesc',1000);
+    markErr('fDesc','eDesc',false);
+  });
+  $('fNotif').addEventListener('input', () => markErr('fNotif','eNotif',false));
+
+  // Normaliza título ao sair
+  $('fTitulo').addEventListener('blur', () => {
+    const el = $('fTitulo');
+    el.value = el.value.trim().replace(/\s{2,}/g,' ').toUpperCase();
+    updateChar('fTitulo','cTitulo',40);
+  });
+
+  // ── Campo local com datalist (busca por digitação) ──────────────────────
+  /*
+    O datalist não tem um evento "selecionou sugestão" confiável em todos os browsers.
+    A solução padrão é escutar o evento 'input' e verificar se o valor digitado
+    corresponde exatamente a um dos códigos no CONFIG.locais.
+    Se sim, aplicamos o local. Se o campo for limpo, limpamos o estado.
+  */
+  const localInput = $('fLocalInput');
+  if (localInput) {
+    localInput.addEventListener('input', function() {
+      const val = this.value.trim();
+
+      // Tenta encontrar código exato (pode vir como "COD" ou "COD — Desc")
+      const codigoPuro = val.split('—')[0].trim();
+
+      if (CONFIG.locais[codigoPuro]) {
+        // Código válido encontrado na lista
+        applyLocal(codigoPuro, 'lista');
+      } else if (!val) {
+        clearLocal();
+      } else {
+        // Digitação livre ainda em andamento — limpa confirmações mas não bloqueia
+        $('fLocal').value = '';
+        $('localChip').classList.add('hidden');
+        $('localBanner').classList.add('hidden');
+        localInput.classList.remove('is-ok');
+      }
+      markErr('fLocalInput','eLocal', false);
+    });
+
+    // Ao sair do campo, se tiver texto mas não for válido, aceita como local livre
+    localInput.addEventListener('blur', function() {
+      const val = this.value.trim();
+      if (val && !$('fLocal').value) {
+        // Aceita digitação livre (local não está na lista mas pode ser válido)
+        applyLocal(val, 'lista');
+      }
+    });
+  }
+
+  // Scanner
+  $('btnScan').addEventListener('click', openScanner);
+  $('btnCamClose').addEventListener('click', closeScanner);
+
+  // Prioridade
+  document.querySelectorAll('.p-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.p-opt').forEach(b => b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      $('fPrio').value = btn.dataset.p;
+      state.prioridade = btn.dataset.p;
+      showErr('ePrio', false);
+    });
+  });
+
+  // Sucesso
+  $('btnNova').addEventListener('click', () => {
+    $('successWrap').classList.add('hidden');
+    $('formMain').classList.remove('hidden');
+    resetForm();
+  });
+  $('btnCopy').addEventListener('click', () => {
+    if (!state.ultimoResumo) return;
+    navigator.clipboard.writeText(state.ultimoResumo)
+      .then(()  => toast('📋 Resumo copiado!'))
+      .catch(()  => toast('⚠ Não foi possível copiar.'));
+  });
+
+  // ── Painel de registros ───────────────────────────────────────────────────
+  /*
+    Os registros são salvos no localStorage com a chave "iw21_PROTOCOLO".
+    O índice de todos os protocolos fica em "iw21_index".
+    Aqui lemos esse índice, buscamos cada registro e montamos o painel.
+  */
+  $('btnVerRegistros').addEventListener('click', () => {
+    $('formMain').classList.add('hidden');
+    $('successWrap').classList.add('hidden');
+    $('localBanner').classList.add('hidden');
+    $('registrosWrap').classList.remove('hidden');
+    renderRegistros();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  $('btnFecharRegistros').addEventListener('click', () => {
+    $('registrosWrap').classList.add('hidden');
+    $('formMain').classList.remove('hidden');
+  });
+
+  $('btnLimparRegistros').addEventListener('click', () => {
+    if (!confirm('Apagar TODOS os registros salvos neste navegador? Esta ação não pode ser desfeita.')) return;
+    const idx = JSON.parse(localStorage.getItem('iw21_index')||'[]');
+    idx.forEach(id => localStorage.removeItem(`iw21_${id}`));
+    localStorage.removeItem('iw21_index');
+    renderRegistros();
+    toast('🗑 Registros apagados.');
+  });
+
+  // Parâmetro URL
+  try {
+    const local = new URLSearchParams(window.location.search).get('local');
+    if (local) applyLocal(local, 'url');
+  } catch(_) {}
+});
+
+/* ═══════════════════════════════════════════════════════
+   RENDERIZAR REGISTROS LOCAIS
+   Explica o que cada linha de código faz para aprendizado
+═══════════════════════════════════════════════════════ */
+function renderRegistros() {
+  const container = $('listaRegistros');
+  container.innerHTML = '';
+
+  // 1. Lê o índice de protocolos do localStorage
+  const idx = JSON.parse(localStorage.getItem('iw21_index') || '[]');
+
+  if (!idx.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">Nenhum registro salvo ainda.</p>';
+    return;
+  }
+
+  // 2. Para cada protocolo, busca o objeto completo e monta um card
+  [...idx].reverse().forEach(id => {
+    const raw = localStorage.getItem(`iw21_${id}`);
+    if (!raw) return;
+
+    // 3. Converte o texto JSON de volta para um objeto JavaScript
+    let reg;
+    try { reg = JSON.parse(raw); } catch(_) { return; }
+
+    // 4. Cria o card visualmente
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:6px';
+
+    // Linha de protocolo + prioridade
+    const top = document.createElement('div');
+    top.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px';
+
+    const proto = document.createElement('span');
+    proto.style.cssText = 'font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.03em';
+    proto.textContent = reg.ID;
+
+    const prioColors = {'1':'var(--p1-tx)','2':'var(--p2-tx)','3':'var(--p3-tx)','4':'var(--p4-tx)'};
+    const prioBgs    = {'1':'var(--p1-bg)','2':'var(--p2-bg)','3':'var(--p3-bg)','4':'var(--p4-bg)'};
+    const prio = document.createElement('span');
+    prio.style.cssText = `font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:${prioBgs[reg.Prioridade]||'#eee'};color:${prioColors[reg.Prioridade]||'#333'}`;
+    prio.textContent = reg.PrioridadeLabel || '—';
+
+    top.appendChild(proto);
+    top.appendChild(prio);
+
+    // Título
+    const titulo = document.createElement('p');
+    titulo.style.cssText = 'font-size:14px;font-weight:600;color:var(--text)';
+    titulo.textContent = reg.TituloNota;
+
+    // Local + data
+    const meta = document.createElement('p');
+    meta.style.cssText = 'font-size:12px;color:var(--text2)';
+    const dataHora = reg.DataHoraCriacao ? new Date(reg.DataHoraCriacao).toLocaleString('pt-BR') : '—';
+    meta.textContent = `📍 ${reg.LocalInstalacao}  ·  🕐 ${dataHora}`;
+
+    card.appendChild(top);
+    card.appendChild(titulo);
+    card.appendChild(meta);
+    container.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
